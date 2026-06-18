@@ -1,0 +1,13 @@
+{
+    "domain": "vacuum360",
+    "name": "360 Vacuum",
+    "version": "0.1.0",
+    "config_flow": true,
+    "documentation": "https://github.com/TonnyMaster1/vacuum360-homeassistant",
+    "issue_tracker": "https://github.com/TonnyMaster1/vacuum360-homeassistant/issues",
+    "requirements": [],
+    "codeowners": [
+        "@TonnyMaster1"
+    ],
+    "iot_class": "cloud_polling"
+}

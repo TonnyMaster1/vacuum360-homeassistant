@@ -1,0 +1,14 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "360 Vacuum",
+        "description": "Configure your 360 robot.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    }
+  }
+}
