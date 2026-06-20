@@ -1,6 +1,4 @@
-"""Platform placeholder for 360 Vacuum."""
-
-from __future__ import annotations
+"""Button platform."""
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -12,5 +10,4 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the platform."""
-    return
+    """Set up button platform."""
