@@ -6,6 +6,9 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
+from aiohttp import ClientSession
+
+from .cloud import Vacuum360Cloud
 from .models import Vacuum360Status
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,20 +34,31 @@ class Vacuum360Device:
 class Vacuum360Api:
     """360 cloud API client."""
 
-    def __init__(self, username: str, password: str, sn: str | None = None) -> None:
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        sn: str | None = None,
+        session: ClientSession | None = None,
+    ) -> None:
         """Initialize API."""
         self.username = username
         self.password = password
         self.sn = sn
         self.token: str | None = None
 
-    async def async_login(self) -> bool:
-        """Temporary login placeholder."""
-        if not self.username or not self.password:
-            raise Vacuum360AuthError("Missing username or password")
+        self.qid = "3405770713"
+        self.sid = "eaa196502016cdb6ebdd540f516b8702"
 
-        self.token = "temporary-token"
-        _LOGGER.warning(">>> 360 LOGIN OK <<<")
+        self.cloud = Vacuum360Cloud(session, self.qid, self.sid) if session else None
+
+    async def async_login(self) -> bool:
+        """Temporary cookie login."""
+        if not self.qid or not self.sid:
+            raise Vacuum360AuthError("Missing qid or sid")
+
+        self.token = "cookie-authenticated"
+        _LOGGER.warning(">>> 360 COOKIE LOGIN OK <<<")
         return True
 
     async def async_get_devices(self) -> list[Vacuum360Device]:
@@ -56,7 +70,7 @@ class Vacuum360Api:
 
         return [
             Vacuum360Device(
-                sn="360TY820103026954",
+                sn=self.sn or "360TY820103026954",
                 name="Aspirateur !",
                 model="X80-L",
             )
@@ -86,24 +100,28 @@ class Vacuum360Api:
     async def async_send_command(
         self,
         info_type: int,
-        data: dict[str, Any],
+        data: dict[str, Any] | str | None,
     ) -> dict[str, Any]:
-        """Temporary command transport."""
+        """Send command to cloud."""
         if self.token is None:
             raise Vacuum360AuthError("Not authenticated")
+
+        if self.cloud is None:
+            raise Vacuum360ApiError("Cloud session not initialized")
+
+        if self.sn is None:
+            raise Vacuum360ApiError("Missing robot serial number")
 
         _LOGGER.warning(">>> 360 SEND COMMAND <<<")
         _LOGGER.warning("SN: %s", self.sn)
         _LOGGER.warning("infoType: %s", info_type)
         _LOGGER.warning("data: %s", data)
 
-        return {
-            "sn": self.sn,
-            "infoType": info_type,
-            "data": data,
-            "success": False,
-            "message": "Cloud transport not implemented yet",
-        }
+        return await self.cloud.async_send_command(
+            sn=self.sn,
+            info_type=info_type,
+            data=data,
+        )
 
     async def async_start(self) -> dict[str, Any]:
         """Start cleaning."""
